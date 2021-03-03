@@ -23,6 +23,9 @@ export const EmployeeDetail = () => {
           {/* What's up with the question mark???? See below.*/}
           <div className="employee__locationName">Location: {employee.location?.name}</div>
           <div className="employee__locationAddress">Address: {employee.location?.address}</div>
+          <button onClick= {()=>{
+              history.push(`/employees/edit/${employee.id}`)
+          }}>Edit</button>
         </section>
       )
 }

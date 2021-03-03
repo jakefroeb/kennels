@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useState } from "react"
 import { LocationContext } from "../locations/LocationProvider"
 import "./Employee.css"
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { EmployeeContext} from "./EmployeeProvider";
 
 export const EmployeeForm = () => {
-    const {addEmployee} = useContext(EmployeeContext)
+    const {addEmployee, getEmployeeById, updateEmployee} = useContext(EmployeeContext)
     const { locations, getLocations } = useContext(LocationContext)
+    const [isLoading, setIsLoading] = useState(true)
+    const {employeeId} = useParams()
     const [employee, setEmployee] = useState({
       name: "",
       locationId: 0
@@ -15,6 +17,18 @@ export const EmployeeForm = () => {
 
     useEffect(() => {
       getLocations()
+      .then(()=>{
+        if(employeeId){
+          getEmployeeById(employeeId)
+          .then(employee => {
+            setEmployee(employee)
+            setIsLoading(false)
+          })
+          
+        }else{
+          setIsLoading(false)
+        }
+      })
     }, [])
 
     const handleControlledInputChange = (event) => {
@@ -25,14 +39,18 @@ export const EmployeeForm = () => {
 
     const handleClickSaveEmployee = (event) => {
       event.preventDefault()
-
       employee.locationId = parseInt(employee.locationId)
 
       if (employee.locationId === 0) {
         window.alert("Please select a location")
       } else {
-        addEmployee(employee)
-        .then(() => history.push("/employees"))
+        if(employeeId){
+          updateEmployee(employee)
+          .then(()=> history.push(`/employees/detail/${employee.id}`))
+        }else{
+          addEmployee(employee)
+          .then(() => history.push("/employees"))
+        }
       }
     }
 
@@ -48,7 +66,7 @@ export const EmployeeForm = () => {
           <fieldset>
               <div className="form-group">
                   <label htmlFor="location">Assign to location: </label>
-                  <select defaultValue={employee.locationId} onChange={handleControlledInputChange} name="locationId" id="locationId" className="form-control" >
+                  <select value={employee.locationId} onChange={handleControlledInputChange} name="locationId" id="locationId" className="form-control" >
                       <option value="0">Select a location</option>
                       {locations.map(l => (
                           <option key={l.id} value={l.id}>
@@ -59,8 +77,9 @@ export const EmployeeForm = () => {
               </div>
           </fieldset>
           <button className="btn btn-primary"
+            disabled= {isLoading}
             onClick={handleClickSaveEmployee}>
-            Save Employee
+            {employeeId ? "Edit Employee" : "Save Employee"}
           </button>
       </form>
     )
