@@ -18,6 +18,7 @@ export const AnimalForm = () => {
 
     const [animal, setAnimal] = useState({
       name: "",
+      breed: "",
       locationId: 0,
       customerId: 0
     });
@@ -69,6 +70,12 @@ export const AnimalForm = () => {
               <div className="form-group">
                   <label htmlFor="name">Animal name:</label>
                   <input type="text" id="name" onChange={handleControlledInputChange} required autoFocus className="form-control" placeholder="Animal name" value={animal.name}/>
+              </div>
+          </fieldset>
+          <fieldset>
+              <div className="form-group">
+                  <label htmlFor="breed">Animal breed:</label>
+                  <input type="breed" id="breed" onChange={handleControlledInputChange} required className="form-control" placeholder="Animal breed" value={animal.breed}/>
               </div>
           </fieldset>
           <fieldset>
