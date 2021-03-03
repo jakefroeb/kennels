@@ -1,15 +1,17 @@
 import React, { useContext, useEffect, useState } from "react"
 import { LocationContext } from "../locations/LocationProvider"
 import "./Location.css"
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 export const LocationForm = () => {
-    const {addLocation} = useContext(LocationContext)
+    const {addLocation, updateLocation, getLocationById} = useContext(LocationContext)
     const [location, setLocation] = useState({
       name: "",
       address: "",
     });
     const history = useHistory();
+    const [isLoading, setIsLoading] = useState(true);
+    const {locationId} = useParams()
 
     const handleControlledInputChange = (event) => {
       const newLocation = { ...location }
@@ -17,11 +19,27 @@ export const LocationForm = () => {
       setLocation(newLocation)
     }
 
-    const handleClickSaveLocation = (event) => {
-      event.preventDefault()
+    const handleClickSaveLocation = () => {
+      setIsLoading(true)
+      if(locationId){
+        updateLocation(location)
+        .then(()=> history.push(`/locations/detail/${location.id}`))
+      }else{
         addLocation(location)
         .then(() => history.push("/locations"))
       }
+      }
+    useEffect(()=>{
+      if(locationId){
+        getLocationById(locationId)
+        .then(location => {
+          setLocation(location)
+          setIsLoading(false)
+        })
+      }else{
+        setIsLoading(false)
+      }
+    },[])
     
 
     return (
@@ -40,8 +58,11 @@ export const LocationForm = () => {
               </div>
           </fieldset>
           <button className="btn btn-primary"
-            onClick={handleClickSaveLocation}>
-            Save Location
+            disabled={isLoading}
+            onClick={event =>{
+              event.preventDefault()
+              handleClickSaveLocation()}}>
+            {locationId ? "Edit Location" : "Save Location"}
           </button>
       </form>
     )
