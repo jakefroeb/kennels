@@ -22,10 +22,15 @@ export const LocationForm = () => {
     const handleClickSaveLocation = () => {
       setIsLoading(true)
       if(locationId){
-        updateLocation(location)
+        updateLocation({name: location.name,
+                        id: location.id,
+                        address: location.address})
         .then(()=> history.push(`/locations/detail/${location.id}`))
       }else{
-        addLocation(location)
+        addLocation({
+          name: location.name,
+          address: location.address
+        })
         .then(() => history.push("/locations"))
       }
       }
